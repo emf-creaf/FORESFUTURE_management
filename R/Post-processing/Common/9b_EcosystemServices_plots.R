@@ -885,19 +885,22 @@ ES_period_grp_new <- ES_period_new %>% group_by(Period, Model, Management, Clima
 
 saveRDS(ES_period_grp_new, "Rdata/ES_period_grp_0209.rds")
 
-# ES_state_grp <- ES_state %>% group_by(Year, Model, Management, Climate) %>%
-#   summarize(across(.cols = ES1_VolumeStructure:ES5_RecreationalValue, .fns = list(mean= ~ mean(., na.rm = TRUE),
-#                                                                                  sum= ~ sum(., na.rm = TRUE))))
-# saveRDS(ES_state_grp, "Rdata/ES_state_grp_0209.rds")
+ES_state_grp <- ES_state |> mutate(Period = case_when((Year>=2000 & Year<=2020) ~ "2001-2020",
+                                                      (Year>=2031 & Year<=2050) ~ "2031-2050",
+                                                      (Year>=2081 & Year<=2100) ~ "2081-2100")) |> 
+  group_by(Period, Model, Management, Climate) |> 
+  summarize(across(.cols = ES1_VolumeStructure:ES5_RecreationalValue, .fns = list(mean= ~ mean(., na.rm = TRUE),
+                                                                                 sum= ~ sum(., na.rm = TRUE))))
+saveRDS(ES_state_grp, "Rdata/ES_state_grp_0810.rds")
 
 
 ## 
 rm(list=ls())
 
 ES_period_grp <- readRDS("Rdata/ES_period_grp_0209.rds")
-ES_state_grp <- readRDS("Rdata/ES_state_grp.rds")
 
-# Data creation
+
+# Data creation period
 diff_data = vector(mode = "list")
 diff_data_bau = vector(mode = "list")
 full_data = NULL
@@ -968,7 +971,62 @@ for(m in unique(ES_period_grp$Model)){
   }
 }
 
+# Data creation state
+ES_state_grp <- readRDS("Rdata/ES_state_grp_0810.rds")
 
+create_diff_bau_state <- function(){
+  diff_data = vector(mode = "list")
+  diff_data_bau = vector(mode = "list")
+  full_data = NULL
+  full_data_bau = NULL
+  for(m in unique(ES_state_grp$Model)){
+    for(clim in unique(ES_state_grp$Climate)){
+      for(man in unique(ES_state_grp$Management)){
+        aux_bau <- NULL
+        cat(paste("Processing",m, clim, man), "\n")
+        for(period in unique(ES_state_grp$Period)){
+          if(is.na(period))next
+          base_bau <- ES_state_grp %>% filter(Period == period,
+                                              Model == m,
+                                              Management == "BAU",
+                                              Climate == clim) %>% 
+            select(ES1_VolumeStructure_mean:ES5_RecreationalValue_sum) %>% 
+            st_drop_geometry()
+
+          comp_value <- ES_state_grp %>% filter(Period == period,
+                                                Model == m,
+                                                Management == man,
+                                                Climate == clim)%>% 
+            select(ES1_VolumeStructure_mean:ES5_RecreationalValue_sum)%>% 
+            st_drop_geometry()
+          
+          # BAU
+          diff_perc_bau <- ((comp_value-base_bau)/base_bau)*100
+          t_diff_bau <- as.data.frame(t(diff_perc_bau)) ; colnames(t_diff_bau) <- paste("diff",period, sep = "_")
+          
+          if(is.null(aux_bau)){
+            aux_bau <- t_diff_bau
+          } else {
+            aux_bau <- cbind(aux_bau, t_diff_bau)
+          }
+          
+          
+        }
+        # BAU
+        aux_bau$Climate = clim
+        aux_bau$Management = man
+        aux_bau$Model = m
+        aux_bau$ES=rownames(aux_bau)
+        diff_data_bau[[paste(m, clim, man, sep = "_")]] <- aux_bau
+        full_data_bau <- rbind(full_data_bau, aux_bau)
+        
+      }
+    }
+  }
+  return(full_data_bau)
+}
+
+full_data_bau_state <- create_diff_bau_state()
 
 ## Comparison in time ---------------------------------------------------
 
@@ -1000,7 +1058,7 @@ a <- gt(full_data_filt) |>
 gtsave(a, "Tables/ES_time_0209.html")
 
 
-## Comparison with BAU ---------------------------------------------------
+## Comparison with BAU period ---------------------------------------------------
 full_data_bau_filt <- full_data_bau %>% 
   select(Model, Climate, Management,ES, "diff_2001-2020", "diff_2031-2050", "diff_2081-2100") %>% 
   filter(rownames(full_data_bau) %in% grep("_mean", rownames(full_data_bau), value = T)) 
@@ -1018,9 +1076,29 @@ a <- gt(full_data_bau_filt) |>
 gtsave(a, "Tables/ES_BAU_0209.html")
 
 
+# Comparison with BAU state ---------------------------------------------------
+full_data_bau_filt <- full_data_bau_state  %>% 
+  select(Model, Climate, Management,ES, "diff_2001-2020", "diff_2031-2050", "diff_2081-2100") %>% 
+  filter(rownames(full_data_bau_state ) %in% grep("_mean", rownames(full_data_bau_state ), value = T)) 
+rownames(full_data_bau_filt) <- NULL
+
+full_data_bau_filt$ES <- substr(full_data_bau_filt$ES, 1, nchar(full_data_bau_filt$ES)-5)
+knitr::kable(full_data_bau_filt)
 
 
+full_data_bau_filt <- full_data_bau_filt %>% mutate(across(where(is.numeric),\(x) round(x, 1)))
+a <- gt(full_data_bau_filt) |>
+  tab_header(title = md("**ES differences**"),
+             subtitle = md("All the values are expressed in percentage and calculated as the difference respect the BAU value of reference")) 
 
+gtsave(a, "Tables/ES_BAU_state_0810.html")
+
+a_recreational <- full_data_bau_filt |> filter(ES == "ES5_RecreationalValue")
+a_recreational_table <- gt(a_recreational) |>
+  tab_header(title = md("**ES recreational values differences**"),
+             subtitle = md("All the values are expressed in percentage and calculated as the difference respect the BAU value of reference")) 
+
+gtsave(a_recreational_table, "Tables/ES_BAU_state_recreationalvalue_0810.html")
 
 
 
