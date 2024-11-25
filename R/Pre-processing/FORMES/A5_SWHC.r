@@ -12,7 +12,6 @@ library(tidyverse)
 
 
 
-## HISTORIC -----
 # load interpolated data from FORMESdata directory
 setwd("C:/Users/giuseppe.capizzi/OneDrive - ctfc.cat/FORMESdata/Rdata/Interpolated_climate_historic")
 

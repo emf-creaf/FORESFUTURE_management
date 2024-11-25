@@ -15,7 +15,6 @@ run_scenarios <- function(rcp,mgm, plotData, perc = 30){
     # --- #
     
     # run #
-    setwd("C:/Users/giuseppe.capizzi/OneDrive - ctfc.cat/OCCC_ScnForestals")
     runScenarioFORMES(scenDir = paste0("Rdata/Scenarios/", scenName), clim = plotDataDyn,
                       treeData = NULL, params = params, plotData = plotData,
                       customPrescription =  scnPrescription, customDemand = demand)

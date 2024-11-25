@@ -14,11 +14,11 @@ library(readxl)
 options(dplyr.summarise.inform = FALSE)
 
 # load demand function
-source("Rscripts/A6_demand_function.R")
-source("Rscripts/A3b_run_scenarios_function.R")
+source("R/Simulation/FORMES/A6_demand_function.R")
+source("R/Simulation/FORMES/A3b_run_scenarios_function.R")
 
 ## A2.1 Build initial plotData ----------------------------------------------------------------------
-nfiplot = readRDS("Rdata/nfiplot.rds")
+nfiplot = readRDS("RData/nfiplot.rds")
 # Variables:
 # CCWD     CSWD      Rad     Temp     Prec       PET     SWHC 
 # are not included in nfiplot as medfate does not need them.
@@ -74,7 +74,7 @@ treedata_formes <- treedata_formes %>%
   rename(H = Height)
 
 # save treedata 
-saveRDS(treedata_formes, "Rdata/treedata_FORMES.rds")
+saveRDS(treedata_formes, "RData/treedata_FORMES.rds")
 
 
 # 
@@ -169,7 +169,7 @@ demand_2001_2020 <- list(Barcelona, Girona, Lleida, Tarragona)
 names(demand_2001_2020) <- c("Barcelona", "Girona", "Lleida", "Tarragona")
 
 # Save the demand 
-saveRDS(demand_2001_2020, "Rdata/demand_2001_2020.rds")
+saveRDS(demand_2001_2020, "RData/demand_2001_2020.rds")
 
 
 ## A2.4 Build climatic projections ----------------------------------------------------------------------
@@ -180,14 +180,14 @@ saveRDS(demand_2001_2020, "Rdata/demand_2001_2020.rds")
 ## Retrieve default FORMES parameters
 params = defaultParamsFORMES()
 ## Load demand
-demand_2001_2020 <- readRDS("Rdata/demand_2001_2020.rds")
+demand_2001_2020 <- readRDS("RData/demand_2001_2020.rds")
 ## Load treedata
-treedata_FORMES <- readRDS("Rdata/treedata_FORMES.rds")
+treedata_FORMES <- readRDS("RData/treedata_FORMES.rds")
 ## Load PlotData
-plotData_OCCC <- readRDS("Rdata/plotData_OCCC.rds")
+plotData_OCCC <- readRDS("RData/plotData_OCCC.rds")
 row.names(plotData_OCCC) <- plotData_OCCC$ID
 ## Load PlotDataDyn
-plotDataDyn_s1_2 <- readRDS("Rdata/plotDataDyn/plotDataDyn_s1_2.rds")
+plotDataDyn_s1_2 <- readRDS("RData/plotDataDyn/plotDataDyn_s1_2.rds")
 ## No climate change (by now)
 plotDataDyn = NULL
 plotDataDyn = plotDataDyn_s1_2
@@ -215,14 +215,13 @@ scnPrescription$thinBAtarget <- NA
 
 # Run the scenario
 scenName = "BAU_2001-2020"
-# setwd("C:/Users/giuseppe.capizzi/OneDrive - ctfc.cat/OCCC_ScnForestals")
 plotData_OCCC$ID = ifelse(nchar(plotData_OCCC$ID)==5, paste0("0", plotData_OCCC$ID), plotData_OCCC$ID)
 plotData_OCCC$Province = ifelse(nchar(plotData_OCCC$Province)==1, paste0("0", plotData_OCCC$Province), plotData_OCCC$Province)
 row.names(plotData_OCCC) = plotData_OCCC$ID
 plotDataDyn_s1_2$ID = ifelse(nchar(plotDataDyn_s1_2$ID)==5, paste0("0", plotDataDyn_s1_2$ID), plotDataDyn_s1_2$ID)
 treedata_FORMES$ID = ifelse(nchar(treedata_FORMES$ID)==5, paste0("0", treedata_FORMES$ID), treedata_FORMES$ID)
 params$provs = c("08", "17", "25", "43")
-runScenarioFORMES(scenDir = paste0("Rdata/Scenarios/", scenName), clim = plotDataDyn_s1_2, 
+runScenarioFORMES(scenDir = paste0("RData/Scenarios/", scenName), clim = plotDataDyn_s1_2, 
                   treeData = treedata_FORMES, params = params, plotData = plotData_OCCC,
                   customPrescription =  scnPrescription, customDemand = demand_2001_2020)
 
@@ -231,10 +230,10 @@ runScenarioFORMES(scenDir = paste0("Rdata/Scenarios/", scenName), clim = plotDat
 
 
 # check demandrow and prescriptionrow
-barc <- readRDS("C:/Users/giuseppe.capizzi/OneDrive - ctfc.cat/OCCC_ScnForestals/Rdata/Scenarios/BAU_2001-2020/8.rds")
-gir <- readRDS("C:/Users/giuseppe.capizzi/OneDrive - ctfc.cat/OCCC_ScnForestals/Rdata/Scenarios/BAU_2001-2020/17.rds")
-llei <- readRDS("C:/Users/giuseppe.capizzi/OneDrive - ctfc.cat/OCCC_ScnForestals/Rdata/Scenarios/BAU_2001-2020/25.rds")
-tarr <- readRDS("C:/Users/giuseppe.capizzi/OneDrive - ctfc.cat/OCCC_ScnForestals/Rdata/Scenarios/BAU_2001-2020/43.rds")
+barc <- readRDS("RData/Scenarios/BAU/BAU_2001-2020/8.rds")
+gir <- readRDS("RData/Scenarios/BAU/BAU_2001-2020/17.rds")
+llei <- readRDS("RData/Scenarios/BAU/BAU_2001-2020/25.rds")
+tarr <- readRDS("RData/Scenarios/BAU/BAU_2001-2020/43.rds")
 
 
 sum(is.na(barc$plotDataSuppl$DemandRow))
@@ -255,26 +254,25 @@ sum(is.na(tarr$plotDataSuppl$PrescriptionRow))
   
   
 ## A2.6 NOGEST, years 2001 to 2100 -----
-setwd("C:/Users/giuseppe.capizzi/OneDrive - ctfc.cat/OCCC_ScnForestals")
 
 ## Retrieve default FORMES parameters
 params = defaultParamsFORMES()
 ## set demand = to 0
 params$demandMultiplier = 0
 ## Load treedata
-treedata_FORMES <- readRDS("Rdata/treedata_FORMES.rds")
+treedata_FORMES <- readRDS("RData/treedata_FORMES.rds")
 ## Load PlotData
-plotData_OCCC <- readRDS("Rdata/plotData_OCCC.rds")
+plotData_OCCC <- readRDS("RData/plotData_OCCC.rds")
 row.names(plotData_OCCC) <- plotData_OCCC$ID
 
 ## Load PlotDataDyn
-plotDataDyn_s1_2 <- readRDS("Rdata/plotDataDyn/plotDataDyn_s1_2.rds")
+plotDataDyn_s1_2 <- readRDS("RData/plotDataDyn/plotDataDyn_s1_2.rds")
 
-plot_data_files <- list.files("Rdata/plotDataDyn/")
+plot_data_files <- list.files("RData/plotDataDyn/")
 plot_data_files <- grep("(2021_2030|2031_2040|2041_2050|2051_2060|2061_2070|2071_2080|2081_2090|2091_2100)",plot_data_files, value = T)
 # load files
 for (f in plot_data_files){
-  assign(substr(f, 1,24),readRDS(paste0("Rdata/plotDataDyn/", f)))
+  assign(substr(f, 1,24),readRDS(paste0("RData/plotDataDyn/", f)))
 }
 
 ## Merge all the plotDataDyn for the 10 steps...only works for this scenario
@@ -320,14 +318,12 @@ burntAreaProv = NULL
 
 # Run the scenario 45
 scenName = "NOG_2001-2100_45"
-setwd("C:/Users/giuseppe.capizzi/OneDrive - ctfc.cat/OCCC_ScnForestals")
-runScenarioFORMES(scenDir = paste0("Rdata/Scenarios/", scenName), clim = plotDataDyn_45, 
+runScenarioFORMES(scenDir = paste0("RData/Scenarios/", scenName), clim = plotDataDyn_45, 
                   treeData = treedata_FORMES, params = params, plotData = plotData_OCCC)
 
 # Run the scenario 85
 scenName = "NOG_2001-2100_85"
-setwd("C:/Users/giuseppe.capizzi/OneDrive - ctfc.cat/OCCC_ScnForestals")
-runScenarioFORMES(scenDir = paste0("Rdata/Scenarios/", scenName), clim = plotDataDyn_85, 
+runScenarioFORMES(scenDir = paste0("RData/Scenarios/", scenName), clim = plotDataDyn_85, 
                   treeData = treedata_FORMES, params = params, plotData = plotData_OCCC)
 
 
@@ -342,7 +338,6 @@ runScenarioFORMES(scenDir = paste0("Rdata/Scenarios/", scenName), clim = plotDat
 
 
 ## A2.7 BAU, years 2021 to 2100-----
-setwd("C:/Users/giuseppe.capizzi/OneDrive - ctfc.cat/OCCC_ScnForestals")
 
 # set rcp 
 rcp = "85"
@@ -351,25 +346,25 @@ rcp = "85"
 params = defaultParamsFORMES()
 prov <- params$provs
 # Continue from...
-params$continueFromDir = "Rdata/Scenarios/BAU/BAU_2001-2020/"
+params$continueFromDir = "RData/Scenarios/BAU/BAU_2001-2020/"
 
 ## Load demand.... function demand 30% del creixement
 # need to specify which directory...
-demand_2001_2020 <- readRDS("Rdata/demand_2001_2020.rds")
+demand_2001_2020 <- readRDS("RData/demand_2001_2020.rds")
 demand_BAU <- demand_generation(demand_default = demand_2001_2020,
                                 dir = "BAU/BAU_2001-2020",
                                 step = 1,
                                 perc = 30)
 
 ## Load treedata
-# treedata_FORMES <- readRDS("Rdata/treedata_FORMES.rds")
+# treedata_FORMES <- readRDS("RData/treedata_FORMES.rds")
 ## Load PlotData BAU
-plotData_OCCC <- readRDS("Rdata/plotData_OCCC.rds")
+plotData_OCCC <- readRDS("RData/plotData_OCCC.rds")
 row.names(plotData_OCCC) <- plotData_OCCC$ID
 
 ## Load PlotDataDyn (ATTENTION to the rcp)
-if(rcp == "45"){plotDataDyn <- readRDS("Rdata/plotDataDyn/plotDataDyn_45_2021-2030.rds")}
-if(rcp == "85"){plotDataDyn <- readRDS("Rdata/plotDataDyn/plotDataDyn_85_2021-2030.rds")}
+if(rcp == "45"){plotDataDyn <- readRDS("RData/plotDataDyn/plotDataDyn_45_2021-2030.rds")}
+if(rcp == "85"){plotDataDyn <- readRDS("RData/plotDataDyn/plotDataDyn_85_2021-2030.rds")}
 
 plotDataDyn$Step = 1
 ## Time horizon = 10 years
@@ -395,13 +390,12 @@ scnPrescription$thinBAtarget <- NA
 
 # scenName = "BAU/BAU_45/BAU_2021-2030_45"
 scenName = paste0("BAU/BAU_",rcp,"/BAU_2021-2030_", rcp)
-setwd("C:/Users/giuseppe.capizzi/OneDrive - ctfc.cat/OCCC_ScnForestals")
-runScenarioFORMES(scenDir = paste0("Rdata/Scenarios/", scenName), clim = plotDataDyn, 
+runScenarioFORMES(scenDir = paste0("RData/Scenarios/", scenName), clim = plotDataDyn, 
                   treeData = NULL, params = params, plotData = plotData_OCCC,
                   customPrescription =  scnPrescription, customDemand = demand_BAU)
 
 # save demand
-saveRDS(demand_BAU, paste0("Rdata/Demand/BAU/BAU_",rcp,"/demand_2021-2030.rds" ))
+saveRDS(demand_BAU, paste0("RData/Demand/BAU/BAU_",rcp,"/demand_2021-2030.rds" ))
 
 ##
 # change these before to run next step
@@ -412,32 +406,31 @@ next_steps <- c("2031-2040", "2041-2050", "2051-2060", "2061-2070", "2071-2080",
                 "2081-2090", "2091-2100")
 # NOT RUN
 for(s in 1:length(prev_steps)){
-  params$continueFromDir = paste0("Rdata/Scenarios/BAU/BAU_",rcp,"/BAU_", prev_steps[s] ,"_", rcp)
+  params$continueFromDir = paste0("RData/Scenarios/BAU/BAU_",rcp,"/BAU_", prev_steps[s] ,"_", rcp)
   demand_BAU <- demand_generation(demand_default = demand_2001_2020,
                                   dir = paste0("BAU/BAU_",rcp,"/BAU_", prev_steps[s], "_", rcp),
                                   step = 1,
                                   perc = 30)
 
   ## Load PlotDataDyn (ATTENTION to the rcp)
-  plotDataDyn <- readRDS(paste0("Rdata/plotDataDyn/plotDataDyn_",rcp,"_", next_steps[s] ,".rds")) #_
+  plotDataDyn <- readRDS(paste0("RData/plotDataDyn/plotDataDyn_",rcp,"_", next_steps[s] ,".rds")) #_
   plotDataDyn$Step = 1
   scenName = paste0("BAU/BAU_",rcp,"/BAU_",next_steps[s],"_", rcp)
   # --- #
 
   # run #
-  setwd("C:/Users/giuseppe.capizzi/OneDrive - ctfc.cat/OCCC_ScnForestals")
-  runScenarioFORMES(scenDir = paste0("Rdata/Scenarios/", scenName), clim = plotDataDyn,
+  runScenarioFORMES(scenDir = paste0("RData/Scenarios/", scenName), clim = plotDataDyn,
                     treeData = NULL, params = params, plotData = plotData_OCCC,
                     customPrescription =  scnPrescription, customDemand = demand_BAU)
   
   # save demand
-  saveRDS(demand_BAU, paste0("Rdata/Demand/BAU/BAU_",rcp,"/demand_",next_steps[s],".rds" ))
+  saveRDS(demand_BAU, paste0("RData/Demand/BAU/BAU_",rcp,"/demand_",next_steps[s],".rds" ))
 
 }
 
 
 
-# params$continueFromDir = paste0("Rdata/Scenarios/BAU/BAU_", prev_step ,"_85/")
+# params$continueFromDir = paste0("RData/Scenarios/BAU/BAU_", prev_step ,"_85/")
 # demand_BAU <- demand_generation(demand_default = demand_2001_2020,
 #                                 dir = paste0("BAU/BAU_", prev_step, "_85"),
 #                                 step = 1,
@@ -449,21 +442,19 @@ for(s in 1:length(prev_steps)){
 #                 "2081-2090", "2091-2100")
 # # next_step = "2031-2040"
 # ## Load PlotDataDyn (ATTENTION to the rcp)
-# plotDataDyn <- readRDS(paste0("Rdata/plotDataDyn/plotDataDyn_85_", next_step ,".rds")) #_
+# plotDataDyn <- readRDS(paste0("RData/plotDataDyn/plotDataDyn_85_", next_step ,".rds")) #_
 # plotDataDyn$Step = 1
 # scenName = paste0("BAU/BAU_",next_step,"_85") #-
 # # --- #
 # 
 # # run #
-# setwd("C:/Users/giuseppe.capizzi/OneDrive - ctfc.cat/OCCC_ScnForestals")
-# runScenarioFORMES(scenDir = paste0("Rdata/Scenarios/", scenName), clim = plotDataDyn, 
+# runScenarioFORMES(scenDir = paste0("RData/Scenarios/", scenName), clim = plotDataDyn, 
 #                   treeData = NULL, params = params, plotData = plotData_OCCC,
 #                   customPrescription =  scnPrescription, customDemand = demand_BAU)
 # 
 
 
 ## A2.8 RSB, years 2021 to 2100-----
-setwd("C:/Users/giuseppe.capizzi/OneDrive - ctfc.cat/OCCC_ScnForestals")
 
 rcp = "85"
 mgm = "RSB"
@@ -472,25 +463,25 @@ mgm = "RSB"
 params = defaultParamsFORMES()
 prov <- params$provs
 # Continue from...
-params$continueFromDir = "Rdata/Scenarios/BAU/BAU_2001-2020/" # only second step
+params$continueFromDir = "RData/Scenarios/BAU/BAU_2001-2020/" # only second step
 
 ## Load demand.... function demand 30% del creixement
 # need to specify which directory...
-demand_2001_2020 <- readRDS("Rdata/demand_2001_2020.rds")
+demand_2001_2020 <- readRDS("RData/demand_2001_2020.rds")
 demand <- demand_generation(demand_default = demand_2001_2020,
                             dir = "BAU/BAU_2001-2020", # previous step directory
                             step = 1,
                             perc = 30)
 
 ## Load treedata
-# treedata_FORMES <- readRDS("Rdata/treedata_FORMES.rds")
+# treedata_FORMES <- readRDS("RData/treedata_FORMES.rds")
 ## Load PlotData RSB
-plotData <- readRDS(paste0("Rdata/plotData_",mgm, ".rds"))
+plotData <- readRDS(paste0("RData/plotData_",mgm, ".rds"))
 row.names(plotData) <- plotData$ID
 
 ## Load PlotDataDyn (ATTENTION to the rcp)
-if(rcp == "45"){plotDataDyn <- readRDS("Rdata/plotDataDyn/plotDataDyn_45_2021-2030.rds")}
-if(rcp == "85"){plotDataDyn <- readRDS("Rdata/plotDataDyn/plotDataDyn_85_2021-2030.rds")}
+if(rcp == "45"){plotDataDyn <- readRDS("RData/plotDataDyn/plotDataDyn_45_2021-2030.rds")}
+if(rcp == "85"){plotDataDyn <- readRDS("RData/plotDataDyn/plotDataDyn_85_2021-2030.rds")}
 plotDataDyn$Step = 1
 ## Time horizon = 10 years
 params$numSteps = 1
@@ -524,7 +515,7 @@ exclude_2 <- exclude[exclude$prior_agri>10 | exclude$prior_pasture>10,]$IDPARCEL
 # exclude plots in plotData and plotdatasuppl
 plotData <- plotData[!plotData$ID %in%  exclude_1,]
 
-setwd("C:/Users/giuseppe.capizzi/OneDrive - ctfc.cat/OCCC_ScnForestals/Rdata/Scenarios/RSB/BAU_RSB/for_2021-2030")
+setwd("C:/Users/giuseppe.capizzi/OneDrive - ctfc.cat/OCCC_ScnForestals/RData/Scenarios/RSB/BAU_RSB/for_2021-2030")
 # provincias <- c("Barcelona", "Girona", "Lleida", "Tarragona")
 for(p in 1:length(prov)){
   # assign(paste0(provincias[p]), readRDS(paste0(prov[p],".rds")))
@@ -535,15 +526,14 @@ for(p in 1:length(prov)){
 
 # run 
 scenName = paste0(mgm, "/",mgm,"_",rcp,"/",mgm,"_2021-2030_",rcp)
-setwd("C:/Users/giuseppe.capizzi/OneDrive - ctfc.cat/OCCC_ScnForestals")
-runScenarioFORMES(scenDir = paste0("Rdata/Scenarios/", scenName), clim = plotDataDyn, 
+runScenarioFORMES(scenDir = paste0("RData/Scenarios/", scenName), clim = plotDataDyn, 
                   treeData = NULL, params = params, plotData = plotData,
                   customPrescription =  scnPrescription, customDemand = demand)
 
 provincias <- c("Barcelona", "Girona", "Lleida", "Tarragona")
 # check that exclude_1 are not in the results.........
 for(p in 1:length(prov)){
-  assign(paste0(provincias[p]), readRDS(paste0("Rdata/Scenarios/",mgm, "/",mgm,"_",rcp,"/",mgm,"_2021-2030_",rcp,"/", prov[p],".rds")))
+  assign(paste0(provincias[p]), readRDS(paste0("RData/Scenarios/",mgm, "/",mgm,"_",rcp,"/",mgm,"_2021-2030_",rcp,"/", prov[p],".rds")))
 } 
 
 sum(exclude_1 %in% Barcelona$treeDataSequence$ID) # 0, not in data sequence
@@ -557,7 +547,7 @@ plotData <- plotData[!plotData$ID %in%  exclude_1,]
 plotData <- plotData[!plotData$ID %in%  exclude_2,]
 
 
-setwd("C:/Users/giuseppe.capizzi/OneDrive - ctfc.cat/OCCC_ScnForestals/Rdata/Scenarios/RSB/BAU_RSB/for_2031-2040")
+setwd("C:/Users/giuseppe.capizzi/OneDrive - ctfc.cat/OCCC_ScnForestals/RData/Scenarios/RSB/BAU_RSB/for_2031-2040")
 # provincias <- c("Barcelona", "Girona", "Lleida", "Tarragona")
 for(p in 1:length(prov)){
   # assign(paste0(provincias[p]), readRDS(paste0(prov[p],".rds")))
@@ -567,8 +557,7 @@ for(p in 1:length(prov)){
   saveRDS(scn, paste0(prov[p], ".rds"))
 }
 
-setwd("C:/Users/giuseppe.capizzi/OneDrive - ctfc.cat/OCCC_ScnForestals")
-saveRDS(demand, paste0("Rdata/Demand/",mgm,"/",mgm,"_",rcp,"/demand_2021-2030.rds"))
+saveRDS(demand, paste0("RData/Demand/",mgm,"/",mgm,"_",rcp,"/demand_2021-2030.rds"))
 
 ### --- ###
 # run other steps
@@ -585,7 +574,7 @@ run_scenarios(rcp = rcp, mgm = mgm, plotData = plotData)
 
 # run other steps
 prev_step = "2081-2090"
-params$continueFromDir = paste0("Rdata/Scenarios/RSB/RSB_85/RSB_", prev_step ,"_85/")
+params$continueFromDir = paste0("RData/Scenarios/RSB/RSB_85/RSB_", prev_step ,"_85/")
 demand_RSB <- demand_generation(demand_default = demand_2001_2020,
                                 dir = paste0("RSB/RSB_85/RSB_", prev_step, "_85"),
                                 step = 1,
@@ -594,14 +583,13 @@ demand_RSB <- demand_generation(demand_default = demand_2001_2020,
 
 next_step = "2091-2100"
 ## Load PlotDataDyn (ATTENTION to the rcp)
-plotDataDyn <- readRDS(paste0("Rdata/plotDataDyn/plotDataDyn_85_", next_step ,".rds")) #_
+plotDataDyn <- readRDS(paste0("RData/plotDataDyn/plotDataDyn_85_", next_step ,".rds")) #_
 plotDataDyn$Step = 1
 scenName = paste0("RSB/RSB_85/RSB_",next_step,"_85") #-
 # --- #
 
 # run #
-setwd("C:/Users/giuseppe.capizzi/OneDrive - ctfc.cat/OCCC_ScnForestals")
-runScenarioFORMES(scenDir = paste0("Rdata/Scenarios/", scenName), clim = plotDataDyn, 
+runScenarioFORMES(scenDir = paste0("RData/Scenarios/", scenName), clim = plotDataDyn, 
                   treeData = NULL, params = params, plotData = plotData_RSB,
                   customPrescription =  scnPrescription, customDemand = demand_RSB)
 
@@ -609,7 +597,7 @@ runScenarioFORMES(scenDir = paste0("Rdata/Scenarios/", scenName), clim = plotDat
 
 # check that exclude_1 and exclude_2 are not in the results.........
 for(p in 1:length(prov)){
-  assign(paste0(provincias[p]), readRDS(paste0("Rdata/Scenarios/RSB/RSB_85/RSB_2041-2050_85/", prov[p],".rds")))
+  assign(paste0(provincias[p]), readRDS(paste0("RData/Scenarios/RSB/RSB_85/RSB_2041-2050_85/", prov[p],".rds")))
 } 
 
 sum(exclude_1 %in% Barcelona$treeDataSequence$ID) # 0, not in data sequence
@@ -627,7 +615,6 @@ sum(exclude_2 %in% Tarragona$treeDataSequence$ID) # 0, not in data sequence
 
 
 ## A2.9 ASEA, years 2021 to 2100-----
-setwd("C:/Users/giuseppe.capizzi/OneDrive - ctfc.cat/OCCC_ScnForestals")
 
 rcp = "85"
 mgm = "ASEA"
@@ -636,25 +623,25 @@ mgm = "ASEA"
 params = defaultParamsFORMES()
 prov <- params$provs
 # Continue from...
-params$continueFromDir = "Rdata/Scenarios/BAU/BAU_2001-2020/" # only second step
+params$continueFromDir = "RData/Scenarios/BAU/BAU_2001-2020/" # only second step
 
 ## Load demand.... function demand 30% del creixement
 # need to specify which directory...
-demand_2001_2020 <- readRDS("Rdata/demand_2001_2020.rds")
+demand_2001_2020 <- readRDS("RData/demand_2001_2020.rds")
 demand_ASEA <- demand_generation(demand_default = demand_2001_2020,
                                 dir = "BAU/BAU_2001-2020", # previous step directory
                                 step = 1,
                                 perc = 30)
 
 ## Load treedata
-# treedata_FORMES <- readRDS("Rdata/treedata_FORMES.rds")
+# treedata_FORMES <- readRDS("RData/treedata_FORMES.rds")
 ## Load PlotData AMF
-plotData <- readRDS(paste0("Rdata/plotData_",mgm, ".rds"))
+plotData <- readRDS(paste0("RData/plotData_",mgm, ".rds"))
 row.names(plotData) <- plotData$ID
 
 ## Load PlotDataDyn (ATTENTION to the rcp)
-if(rcp == "45"){plotDataDyn <- readRDS("Rdata/plotDataDyn/plotDataDyn_45_2021-2030.rds")}
-if(rcp == "85"){plotDataDyn <- readRDS("Rdata/plotDataDyn/plotDataDyn_85_2021-2030.rds")}
+if(rcp == "45"){plotDataDyn <- readRDS("RData/plotDataDyn/plotDataDyn_45_2021-2030.rds")}
+if(rcp == "85"){plotDataDyn <- readRDS("RData/plotDataDyn/plotDataDyn_85_2021-2030.rds")}
 plotDataDyn$Step = 1
 ## Time horizon = 10 years
 params$numSteps = 1
@@ -678,13 +665,12 @@ scnPrescription$thinBAtarget <- NA
 
 # run step 2
 scenName = paste0(mgm, "/",mgm,"_",rcp,"/",mgm,"_2021-2030_",rcp)
-setwd("C:/Users/giuseppe.capizzi/OneDrive - ctfc.cat/OCCC_ScnForestals")
-runScenarioFORMES(scenDir = paste0("Rdata/Scenarios/", scenName), clim = plotDataDyn, 
+runScenarioFORMES(scenDir = paste0("RData/Scenarios/", scenName), clim = plotDataDyn, 
                   treeData = NULL, params = params, plotData = plotData,
                   customPrescription =  scnPrescription, customDemand = demand_ASEA)
 
 # save demand ATTENZIONE AL MGM
-saveRDS(demand_ASEA, paste0("Rdata/Demand/",mgm,"/",mgm,"_",rcp,"/demand_2021-2030.rds" ))
+saveRDS(demand_ASEA, paste0("RData/Demand/",mgm,"/",mgm,"_",rcp,"/demand_2021-2030.rds" ))
 
 ### --- ###
 # run other steps
@@ -698,7 +684,6 @@ run_scenarios(rcp = rcp, mgm = "ASEA", plotData = plotData)
 # --- #
 
 ## A2.10 AMF, years 2021 to 2100-----
-setwd("C:/Users/giuseppe.capizzi/OneDrive - ctfc.cat/OCCC_ScnForestals")
 
 rcp = "85"
 mgm = "AMF"
@@ -707,25 +692,25 @@ mgm = "AMF"
 params = defaultParamsFORMES()
 prov <- params$provs
 # Continue from...
-params$continueFromDir = "Rdata/Scenarios/BAU/BAU_2001-2020/" # only second step
+params$continueFromDir = "RData/Scenarios/BAU/BAU_2001-2020/" # only second step
 
 ## Load demand.... function demand 30% del creixement
 # need to specify which directory...
-demand_2001_2020 <- readRDS("Rdata/demand_2001_2020.rds")
+demand_2001_2020 <- readRDS("RData/demand_2001_2020.rds")
 demand <- demand_generation(demand_default = demand_2001_2020,
                                  dir = "BAU/BAU_2001-2020", # previous step directory
                                  step = 1,
                                  perc = 40)
 
 ## Load treedata
-# treedata_FORMES <- readRDS("Rdata/treedata_FORMES.rds")
+# treedata_FORMES <- readRDS("RData/treedata_FORMES.rds")
 ## Load PlotData AMF
-plotData <- readRDS(paste0("Rdata/plotData_",mgm, ".rds"))
+plotData <- readRDS(paste0("RData/plotData_",mgm, ".rds"))
 row.names(plotData) <- plotData$ID
 
 ## Load PlotDataDyn (ATTENTION to the rcp)
-if(rcp == "45"){plotDataDyn <- readRDS("Rdata/plotDataDyn/plotDataDyn_45_2021-2030.rds")}
-if(rcp == "85"){plotDataDyn <- readRDS("Rdata/plotDataDyn/plotDataDyn_85_2021-2030.rds")}
+if(rcp == "45"){plotDataDyn <- readRDS("RData/plotDataDyn/plotDataDyn_45_2021-2030.rds")}
+if(rcp == "85"){plotDataDyn <- readRDS("RData/plotDataDyn/plotDataDyn_85_2021-2030.rds")}
 plotDataDyn$Step = 1
 ## Time horizon = 10 years
 params$numSteps = 1
@@ -749,13 +734,12 @@ scnPrescription$thinBAtarget <- NA
 
 # run step 2
 scenName = paste0(mgm, "/",mgm,"_",rcp,"/",mgm,"_2021-2030_",rcp)
-setwd("C:/Users/giuseppe.capizzi/OneDrive - ctfc.cat/OCCC_ScnForestals")
-runScenarioFORMES(scenDir = paste0("Rdata/Scenarios/", scenName), clim = plotDataDyn, 
+runScenarioFORMES(scenDir = paste0("RData/Scenarios/", scenName), clim = plotDataDyn, 
                   treeData = NULL, params = params, plotData = plotData,
                   customPrescription =  scnPrescription, customDemand = demand)
 
 # save demand ATTENZIONE AL MGM
-saveRDS(demand, paste0("Rdata/Demand/",mgm,"/",mgm,"_",rcp,"/demand_2021-2030.rds" ))
+saveRDS(demand, paste0("RData/Demand/",mgm,"/",mgm,"_",rcp,"/demand_2021-2030.rds" ))
 
 ### --- ###
 # run other steps
@@ -770,7 +754,6 @@ run_scenarios(rcp = rcp, mgm = mgm, plotData = plotData, perc = 70)
 
 
 ## A2.11 ACG, years 2021 to 2100-----
-setwd("C:/Users/giuseppe.capizzi/OneDrive - ctfc.cat/OCCC_ScnForestals")
 
 rcp = "45"
 mgm = "ACG"
@@ -779,10 +762,10 @@ mgm = "ACG"
 params = defaultParamsFORMES()
 prov <- params$provs
 # Continue from...
-params$continueFromDir = "Rdata/Scenarios/BAU/BAU_2001-2020/" # only second step
+params$continueFromDir = "RData/Scenarios/BAU/BAU_2001-2020/" # only second step
 
 ## Load demand....in case of ACG the demand is infinite
-demand_ACG <- readRDS("Rdata/demand_2001_2020.rds")
+demand_ACG <- readRDS("RData/demand_2001_2020.rds")
 # select 1 step
 demand_ACG$Barcelona <- demand_ACG$Barcelona[demand_ACG$Barcelona$Step == 1,]
 demand_ACG$Lleida <- demand_ACG$Lleida[demand_ACG$Lleida$Step == 1,]
@@ -795,14 +778,14 @@ demand_ACG$Girona$AnnualDemand <- 10^6
 demand_ACG$Tarragona$AnnualDemand <- 10^6
 
 ## Load treedata
-# treedata_FORMES <- readRDS("Rdata/treedata_FORMES.rds") # only for BAU
+# treedata_FORMES <- readRDS("RData/treedata_FORMES.rds") # only for BAU
 ## Load PlotData AMF
-plotData_ACG <- readRDS("Rdata/plotData_ACG.rds")
+plotData_ACG <- readRDS("RData/plotData_ACG.rds")
 row.names(plotData_ACG) <- plotData_ACG$ID
 
 ## Load PlotDataDyn (ATTENTION to the rcp)
-if(rcp == "45"){plotDataDyn <- readRDS("Rdata/plotDataDyn/plotDataDyn_45_2021-2030.rds")}
-if(rcp == "85"){plotDataDyn <- readRDS("Rdata/plotDataDyn/plotDataDyn_85_2021-2030.rds")}
+if(rcp == "45"){plotDataDyn <- readRDS("RData/plotDataDyn/plotDataDyn_45_2021-2030.rds")}
+if(rcp == "85"){plotDataDyn <- readRDS("RData/plotDataDyn/plotDataDyn_85_2021-2030.rds")}
 plotDataDyn$Step = 1
 ## Time horizon = 10 years
 params$numSteps = 1
@@ -834,36 +817,34 @@ devtools::load_all()
 
 # run step 2
 scenName = "ACG/ACG_45/ACG_2021-2030_45"
-setwd("C:/Users/giuseppe.capizzi/OneDrive - ctfc.cat/OCCC_ScnForestals")
-runScenarioFORMES(scenDir = paste0("Rdata/Scenarios/", scenName), clim = plotDataDyn, 
+runScenarioFORMES(scenDir = paste0("RData/Scenarios/", scenName), clim = plotDataDyn, 
                   treeData = NULL, params = params, plotData = plotData_ACG,
                   customPrescription =  scnPrescription_ACG, customDemand = demand_ACG)
 
 # save demand ATTENZIONE AL MGM
-saveRDS(demand_ACG, paste0("Rdata/Demand/",mgm,"/",mgm,"_",rcp,"/demand_2021-2030.rds" ))
+saveRDS(demand_ACG, paste0("RData/Demand/",mgm,"/",mgm,"_",rcp,"/demand_2021-2030.rds" ))
 
 
 # run other steps
 prev_step = "2081-2090"
-params$continueFromDir = paste0("Rdata/Scenarios/ACG/ACG_85/ACG_", prev_step ,"_85/")
+params$continueFromDir = paste0("RData/Scenarios/ACG/ACG_85/ACG_", prev_step ,"_85/")
 
 # --- #
 
 next_step = "2091-2100"
 ## Load PlotDataDyn (ATTENTION to the rcp)
-plotDataDyn <- readRDS(paste0("Rdata/plotDataDyn/plotDataDyn_85_", next_step ,".rds")) #_
+plotDataDyn <- readRDS(paste0("RData/plotDataDyn/plotDataDyn_85_", next_step ,".rds")) #_
 plotDataDyn$Step = 1
 scenName = paste0("ACG/ACG_85/ACG_",next_step,"_85") #-
 # --- #
 
 # run #
-setwd("C:/Users/giuseppe.capizzi/OneDrive - ctfc.cat/OCCC_ScnForestals")
-runScenarioFORMES(scenDir = paste0("Rdata/Scenarios/", scenName), clim = plotDataDyn, 
+runScenarioFORMES(scenDir = paste0("RData/Scenarios/", scenName), clim = plotDataDyn, 
                   treeData = NULL, params = params, plotData = plotData_ACG,
                   customPrescription =  scnPrescription_ACG, customDemand = demand_ACG)
 
 
-saveRDS(demand_ACG, paste0("Rdata/Demand/",mgm,"/",mgm,"_",rcp,"/demand_",next_step,".rds" ))
+saveRDS(demand_ACG, paste0("RData/Demand/",mgm,"/",mgm,"_",rcp,"/demand_",next_step,".rds" ))
 
 
 
